@@ -1,0 +1,88 @@
+- Apache2 virtualhosts
+	- My test box IP address is: 192.168.80.199
+		 and host name is: mihail-VirtualBox
+
+	1. Install Apache webserver on my host 192.168.80.199
+		- sudo apt-get install apache2
+		- Open your web browser and point it to http://IP_Address or http://localhost
+
+
+	2. Create web directory for each host
+		- I am going to create two virtual hosts, namely web-test1 and web-test2
+			- sudo mkdir -p /var/www/html/web-test1/public_html
+			- sudo mkdir -p /var/www/html/web-test2/public_html
+		- change the ownership for above directories to the regular user
+				- sudo chown -R $USER:$USER /var/www/html/web-test1/public_html
+				- sudo chown -R $USER:$USER /var/www/html/web-test2/public_html
+
+				- Here, $USER refers the currently logged-in user
+
+		- Set read permissions to the Apache root directory i.e /var/www/html/
+
+				- sudo chmod -R 755 /var/www/html/
+
+	
+	3. Create demo web pages for each host
+		- nano /var/www/html/web-test1/public_html/index.html
+			<html>
+			 <head>
+			 <title>www.web-test1</title>
+			 </head>
+			 <body>
+			 <h1>Hello, This is a test page for web-test1 website</h1>
+			 </body>
+			</html>
+
+		- nano /var/www/html/web-test2/public_html/index.html
+			<html>
+			 <head>
+			 <title>www.web-test2</title>
+			 </head>
+			 <body>
+			 <h1>Hello, This is a test page for web-test2 website</h1>
+			 </body>
+			</html>
+
+
+	4. Create configuration file for each host
+		- sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/web-test1.conf
+		- sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/web-test2.conf
+
+		- Edit web-test1.conf file and add the following new content
+			ServerAdmin webmaster@web-test1
+		   	ServerName web-test1
+		   	ServerAlias www.web-test1
+		   	DocumentRoot /var/www/html/web-test1/public_html
+
+		- Edit web-test2.conf file and add the following new content
+			ServerAdmin webmaster@web-test2
+		   	ServerName web-test2
+		   	ServerAlias www.web-test2
+		   	DocumentRoot /var/www/html/web-test2/public_html
+
+
+	5. Enable virtual host configuration files
+		- sudo a2dissite 000-default.conf
+
+		- sudo a2ensite web-test1.conf
+		- sudo a2ensite web-test2.conf
+
+		- sudo systemctl restart apache2
+
+
+	6. Test Virtual hosts
+		- sudo nano vi /etc/hosts (and add the following new content)
+			........
+
+			192.168.80.199 web-test1
+			192.168.80.199 web-test2
+
+			........
+
+	7. Open up your web browser and point it to
+		- http://web-test1
+		- http://web-test2
+
+
+
+

@@ -1,0 +1,63 @@
+How To Set Up Password Authentication with Apache on Ubuntu 16.04
+
+	Step 1 — Installing the Apache Utilities Package
+		1.1. sudo apt-get update
+		1.2. sudo apt-get install apache2-utils
+		1.3. sudo apt install apache2
+
+	Step 2 — Creating the Password File
+		2.1. sudo htpasswd -c /etc/apache2/.htpasswd username
+		2.2. sudo htpasswd /etc/apache2/.htpasswd another_user
+		2.3. cat /etc/apache2/.htpasswd
+
+	Step 3 — Configuring Apache Password Authentication
+		Option 1: Configuring Access Control within the Virtual Host Definition (Preferred)
+			3.1. sudo nano /etc/apache2/sites-enabled/000-default.conf (and edit as follow):
+
+					<VirtualHost *:80>
+					  ServerAdmin webmaster@localhost
+					  DocumentRoot /var/www/html
+					  ErrorLog ${APACHE_LOG_DIR}/error.log
+					  CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+					  <Directory "/var/www/html">
+					      AuthType Basic
+					      AuthName "Restricted Content"
+					      AuthUserFile /etc/apache2/.htpasswd
+					      Require valid-user
+					  </Directory>
+					</VirtualHost>
+
+			3.2. sudo apache2ctl configtest
+			3.3. sudo systemctl restart apache2
+			3.4. sudo systemctl status apache2
+
+		Option 2: Configuring Access Control with .htaccess Files
+			2.1. sudo nano /etc/apache2/apache2.conf (and edit as follow):
+
+					. . .
+
+					<Directory /var/www/>
+					  Options Indexes FollowSymLinks
+					  AllowOverride All
+					  Require all granted
+					</Directory>
+
+					. . .
+
+			2.2. sudo nano /var/www/html/.htaccess (and edit as follow):
+
+					AuthType Basic
+					AuthName "Restricted Content"
+					AuthUserFile /etc/apache2/.htpasswd
+					Require valid-user
+
+			2.3. sudo systemctl restart apache2
+			2.4. sudo systemctl status apache2
+
+	Step 4 — Confirming Password Authentication
+			4.1. https://your_ip:80
+			4.2. Try access from on the another machine from command line:
+				4.2.1. apt install lynx
+				4.2.2. lynx http://ip_address_apache2:80
+	
